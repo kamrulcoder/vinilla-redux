@@ -11,6 +11,8 @@ const DELETE_COUNTER = "DELETE_COUNTER"
 const ADD_COUNTER = "ADD_COUNTER"
 const RESET_VALUE = "RESET_VALUE"
 
+
+
 // create initial state 
 const initialState = {
     counters: [
@@ -21,6 +23,7 @@ const initialState = {
 
 // create action 
 
+
 const addCounter = () => {
     return {
         type: ADD_COUNTER,
@@ -29,30 +32,37 @@ const addCounter = () => {
 }
 
 const deleteCounter = (id) => {
-    return {
+    store.dispatch({
         type: DELETE_COUNTER,
         payload: { id }
-    }
+    })
 }
 
+
 const incrementCounterValue = (id, value) => {
-    return {
+
+    store.dispatch({
         type: INCREMENT_VALUE,
         payload: {
             id,
             value
         }
-    }
+    })
 }
 
-const decrementCounterValue = (id, value) => {
-    return {
+
+const decrementCounterValue = (event, id) => {
+    event.preventDefault()
+    const value = e.target.value;
+    console.log(e)
+    
+    store.dispatch( {
         type: DECREMENT_VALUE,
         payload: {
             id,
             value
         }
-    }
+    })
 }
 
 
@@ -76,10 +86,15 @@ const counterReducer = (state = initialState, action) => {
                 }]
             }
         case DELETE_COUNTER:
-            return {
-                ...state,
-                counters: state.counters.filter(counter => counter.id !== action.payload.id)
-            }
+            if(state.counters.length > 1) {
+                return {
+                    ...state,
+                    counters: state.counters.filter(counter => counter.id !== action.payload.id)
+                }
+            }else{
+                alert("Here is an item. So it cannot be deleted")
+            }    
+           
         case INCREMENT_VALUE:
             return {
                 ...state,
@@ -112,18 +127,16 @@ const store = Redux.createStore(counterReducer);
 const render = () => {
     const state = store.getState();
     const counterList = document.getElementById('all-matches');
-    console.log(counterList)
-
     console.log(state)
-
-
+counterList.innerHTML = ""
 
     state?.counters.forEach(counter => {
-        const outerElement = document.createElement('div');
+        console.log(counter)
+        // const outerElement = document.createElement('div');
         const outer = `
         <div class="match">
         <div class="wrapper">
-            <button class="lws-delete">
+            <button class="lws-delete" onclick=${`deleteCounter(${counter.id})`}>
                 <img src="./image/delete.svg" alt="" />
             </button>
             <h3 class="lws-matchName">${counter.title}</h3>
@@ -143,7 +156,7 @@ const render = () => {
                     type="number"
                     name="decrement"
                     class="lws-decrement"
-                    
+                   
                 />
             </form>
         </div>
@@ -152,8 +165,9 @@ const render = () => {
         </div>
     </div>
         `
-        outerElement.innerHTML = outer;
-        counterList.appendChild(outerElement);
+        // outerElement.innerHTML = outer;
+        counterList.innerHTML += outer;
+        // counterList.appendChild(outerElement);
     })
 };
 
@@ -172,13 +186,19 @@ store.subscribe(render);
 // store.dispatch(addCounter())
 // store.dispatch(addCounter())
 // store.dispatch(addCounter())
+// store.dispatch(addCounter())
 store.dispatch(addCounter())
 
 // store.dispatch(resetValue())
 
+
+// reset button 
 resetButton.addEventListener("click", () => {
     store.dispatch(resetValue())
 })
+
+// add button
 addtButton.addEventListener("click", () => {
     store.dispatch(addCounter())
 })
+
